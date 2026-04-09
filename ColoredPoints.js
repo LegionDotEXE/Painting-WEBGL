@@ -30,10 +30,8 @@ let a_Position;
 let u_FragColor;
 let u_Size;
 
-// var g_points = [];
-// var g_colors = [];
-// var g_sizes = [];
 var g_shapesList = [];
+var g_selectedType = 'point';
 
 // Point class
 class Point {
@@ -58,6 +56,86 @@ class Point {
     // Draw a point
     gl.drawArrays(gl.POINTS, 0, 1);
   }
+}
+
+// Triangle class
+class Triangle {
+  constructor() {
+    this.type = 'triangle';
+    this.position = [0.0, 0.0];
+    this.color = [1.0, 1.0, 1.0, 1.0];
+    this.size = 5.0;
+  }
+
+  render() {
+    var xy = this.position;
+    var rgba = this.color;
+    var size = this.size;
+
+    // Pass the color of a point to u_FragColor variable
+    gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
+
+    // Draw the triangle centered at xy with given size
+    var d = size / 200.0; // scale size to clip coordinates
+    drawTriangle([xy[0], xy[1] + d, xy[0] - d, xy[1] - d, xy[0] + d, xy[1] - d]);
+  }
+}
+
+// Circle class
+class Circle {
+  constructor() {
+    this.type = 'circle';
+    this.position = [0.0, 0.0];
+    this.color = [1.0, 1.0, 1.0, 1.0];
+    this.size = 5.0;
+    this.segments = 10;
+  }
+
+  render() {
+    var xy = this.position;
+    var rgba = this.color;
+    var size = this.size;
+
+    // Pass the color to u_FragColor variable
+    gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
+
+    // Draw the circle as a fan of triangles
+    var d = size / 200.0;
+    var angleStep = 360 / this.segments;
+    for (var angle = 0; angle < 360; angle += angleStep) {
+      var angle1 = angle * Math.PI / 180;
+      var angle2 = (angle + angleStep) * Math.PI / 180;
+      var vec1 = [Math.cos(angle1) * d, Math.sin(angle1) * d];
+      var vec2 = [Math.cos(angle2) * d, Math.sin(angle2) * d];
+
+      drawTriangle([xy[0], xy[1], xy[0] + vec1[0], xy[1] + vec1[1], xy[0] + vec2[0], xy[1] + vec2[1]]);
+    }
+  }
+}
+
+function drawTriangle(vertices) {
+  var n = 3; // The number of vertices
+
+  // Create a buffer object
+  var vertexBuffer = gl.createBuffer();
+  if (!vertexBuffer) {
+    console.log('Failed to create the buffer object');
+    return -1;
+  }
+
+  // Bind the buffer object to target
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  // Write data into the buffer object
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
+
+  // Assign the buffer object to a_Position variable
+  gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+
+  // Enable the assignment to a_Position variable
+  gl.enableVertexAttribArray(a_Position);
+
+  // Draw the triangle
+  gl.drawArrays(gl.TRIANGLES, 0, n);
 }
 
 function setupWebGL() {
@@ -116,23 +194,31 @@ function click(ev) {
   x = ((x - rect.left) - canvas.width/2) / (canvas.width/2);
   y = (canvas.height/2 - (y - rect.top)) / (canvas.height/2);
 
-  // Create a new Point object
-  let point = new Point();
-  point.position = [x, y];
-
   // Read color from sliders
-  point.color = [
-    document.getElementById('redSlider').value / 100,
-    document.getElementById('greenSlider').value / 100,
-    document.getElementById('blueSlider').value / 100,
-    1.0
-  ];
+  var r = document.getElementById('redSlider').value / 100;
+  var g = document.getElementById('greenSlider').value / 100;
+  var b = document.getElementById('blueSlider').value / 100;
 
   // Read size from slider
-  point.size = document.getElementById('sizeSlider').value;
+  var size = document.getElementById('sizeSlider').value;
+
+  // Create the appropriate shape based on selected type
+  let shape;
+  if (g_selectedType == 'point') {
+    shape = new Point();
+  } else if (g_selectedType == 'triangle') {
+    shape = new Triangle();
+  } else if (g_selectedType == 'circle') {
+    shape = new Circle();
+    shape.segments = document.getElementById('segmentSlider').value;
+  }
+
+  shape.position = [x, y];
+  shape.color = [r, g, b, 1.0];
+  shape.size = size;
 
   // Add to shapes list
-  g_shapesList.push(point);
+  g_shapesList.push(shape);
 
   renderAllShapes();
 }
