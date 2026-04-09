@@ -8,7 +8,16 @@
   </head>
   <body onload="main()">
     <canvas id="webgl" width="400" height="400">
+      Please use a browser that supports "canvas"
     </canvas>
+    <br>
+    <label>R:</label> <input type="range" id="redSlider" min="0" max="100" value="100">
+    <label>G:</label> <input type="range" id="greenSlider" min="0" max="100" value="0">
+    <label>B:</label> <input type="range" id="blueSlider" min="0" max="100" value="0">
+    <br>
+    <label>Size:</label> <input type="range" id="sizeSlider" min="1" max="50" value="10">
+    <br>
+    <input type="button" value="Clear Canvas" onclick="clearCanvas()">
     <script src="lib/webgl-utils.js"></script>
     <script src="lib/webgl-debug.js"></script>
     <script src="lib/cuon-utils.js"></script>
