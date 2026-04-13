@@ -1,4 +1,6 @@
-<!-- ColoredPoints.html -->
+<!-- Index.html -->
+
+<!-- Assignment 1: Painting -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +17,8 @@
     <input type="button" value="Triangle" onclick="g_selectedType='triangle'">
     <input type="button" value="Circle" onclick="g_selectedType='circle'">
     <input type="button" value="Clear Canvas" onclick="clearCanvas()">
+    <input type="button" value="Undo" onclick="undoShape()">
+    <input type="button" value="Draw Picture" onclick="drawPicture()">
     <br>
     <label>R:</label> <input type="range" id="redSlider" min="0" max="100" value="100">
     <label>G:</label> <input type="range" id="greenSlider" min="0" max="100" value="0">
@@ -22,8 +26,18 @@
     <br>
     <label>Size:</label> <input type="range" id="sizeSlider" min="1" max="50" value="10">
     <label>Segments:</label> <input type="range" id="segmentSlider" min="3" max="40" value="10">
+    <label>BG Color:</label>
+    <input type="range" id="bgRedSlider" min="0" max="100" value="0">
+    <input type="range" id="bgGreenSlider" min="0" max="100" value="0">
+    <input type="range" id="bgBlueSlider" min="0" max="100" value="0">
+    <input type="button" value="Set BG" onclick="setBgColor()">
     <br>
     <p id="numdot"></p>
+    <br>
+    <p><b>Extra features:</b> Undo button removes the last shape drawn</p>
+    <p><b>Extra features:</b> BG Color sliders + Set BG button let you change the canvas background color.</p>
+    <h3>Reference Drawing:</h3>
+    <img src="5743.jpg" width="400" alt="Reference Hand Drawn Image using Triangles">
     <script src="lib/webgl-utils.js"></script>
     <script src="lib/webgl-debug.js"></script>
     <script src="lib/cuon-utils.js"></script>
